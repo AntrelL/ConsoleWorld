@@ -1,0 +1,15 @@
+<Project DefaultTargets="Publish;CleanUp" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Publish">
+	  <MSBuild Projects="./AdvancedConsoleManager/AdvancedConsoleManager.csproj" Targets="Publish" Properties="Configuration=Release;PublishProfile=FolderProfile" />
+	  <MSBuild Projects="./AdvancedConsole/AdvancedConsole.csproj" Targets="Publish" Properties="Configuration=Release;PublishProfile=FolderProfile;BuildProjectReferences=false" />
+	  <MSBuild Projects="./ConsoleWorldCore/ConsoleWorldCore.csproj" Targets="Publish" Properties="Configuration=Release;PublishProfile=FolderProfile;BuildProjectReferences=false" />
+	  <MSBuild Projects="./ConsoleWorld/ConsoleWorld.csproj" Targets="Publish" Properties="Configuration=Release;PublishProfile=FolderProfile;BuildProjectReferences=false" />
+  </Target>
+  <Target Name="CleanUp" AfterTargets="Publish">
+	<ItemGroup>
+		<JunkFiles Include="./_Build/Publish/*.pdb" />
+		<JunkFiles Include="./_Build/Publish/*.json" />
+	</ItemGroup>
+	<Delete Files="@(JunkFiles)" />
+  </Target>
+</Project>

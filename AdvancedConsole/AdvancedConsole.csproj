@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<RootNamespace>ColdWind.AdvancedConsole</RootNamespace>
+	  
+	<OutputType>Exe</OutputType>
+	<TargetFramework>net9.0-windows</TargetFramework>
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	<SelfContained>true</SelfContained>
+
+	<LangVersion>13.0</LangVersion>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Nullable>enable</Nullable>
+
+	<PublishAot>true</PublishAot>
+	<InvariantGlobalization>true</InvariantGlobalization>
+
+	<BaseOutputPath>..\_Build\</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AdvancedConsoleManager\AdvancedConsoleManager.csproj" />
+  </ItemGroup>
+
+</Project>
