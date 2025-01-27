@@ -1,4 +1,4 @@
-﻿namespace ColdWind.AdvancedConsole.Graphics;
+﻿namespace ColdWind.AdvancedConsoleManager;
 
 public enum Color
 {
