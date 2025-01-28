@@ -1,5 +1,7 @@
 ﻿using ColdWind.AdvancedConsoleManager;
 
+using AdvancedConsoleAPI = ColdWind.AdvancedConsoleManager.AdvancedConsole;
+
 namespace ColdWind.AdvancedConsole;
 
 internal class Window
@@ -16,22 +18,21 @@ internal class Window
 
     private readonly IntPtr Handle;
 
-    public Window(int width, int height, string title = "Advanced Console")
+    public Window(int width, int height, string title = AdvancedConsoleAPI.DefaultTitle)
     {
         Handle = WinAPI.GetConsoleWindow();
         Screen = new Screen(new Vector2Int(width, height));
 
         InitializeStyle();
-        Title = title;
+        SetTitle(title);
     }
 
     public Screen Screen { get; init; }
 
-    public string Title
-    {
-        get => Console.Title;
-        set => Console.Title = value;
-    }
+    public string GetTitle() => Console.Title;
+
+    public void SetTitle(string title) =>
+        Console.Title = title;
 
     public void MoveTo(Vector2Int position)
     {

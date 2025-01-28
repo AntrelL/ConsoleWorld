@@ -1,39 +1,84 @@
 ﻿using ColdWind.AdvancedConsoleManager;
 
+using AdvancedConsoleAPI = ColdWind.AdvancedConsoleManager.AdvancedConsole;
+
 namespace ColdWind.AdvancedConsole;
 
 internal class Program
 {
+    private static ConsoleNetwork? ConsoleNetwork;
+    private static int Id;
+
+    private static Window? Window;
+
     static void Main(string[] args)
     {
-        TestWindow();
+        if (args.Length == 0)
+            throw new ArgumentException("The Advanced Console should only be launched through Manager.");
 
-        Console.WriteLine("Hello, World! (Advanced Console)");
-        Console.ReadKey();
+        Window = new Window(AdvancedConsoleAPI.DefaultWidth, AdvancedConsoleAPI.DefaultHeight);
+
+        Id = int.Parse(args[0]);
+        ConsoleNetwork = new ConsoleNetwork(Id, false);
+
+        ConsoleNetwork.MessageReceived += OnMessageReceived;
+        ConsoleNetwork.Connect();
+
+        while (true)
+            Thread.Sleep(1000);
+        
+        //ConsoleNetwork.MessageReceived -= OnMessageReceived;
+        //ConsoleNetwork.Disconnect();
     }
 
-    private static void TestWindow()
+    private static void OnMessageReceived(string message)
     {
-        var window = new Window(50, 25);
-        window.MoveToCenter();
+        //Console.WriteLine($"Console id={Id} get message: {message}");
 
-        Thread.Sleep(2000);
-        window.MoveTo(new Vector2Int(200, 200));
+        ConsoleNetworkProtocol.ServerCommand command = ConsoleNetworkProtocol.ConvertToServerCommand(message);
 
-        Thread.Sleep(1000);
-        window.Title = "Console :))))";
-        window.Screen.SetSize(75, 20);
-        window.MoveTo(new Vector2Int(1200, 200));
-
-        Thread.Sleep(1000);
-
-        int windowStartPositionX = window.GetPosition().X;
-        int windowStartPositionY = window.GetPosition().Y;
-
-        for (int i = windowStartPositionX; i > windowStartPositionX - 1000; i -= 1)
+        switch (command)
         {
-            window.MoveTo(new Vector2Int(i, window.GetPosition().Y));
-            Thread.Sleep(1);
+            case ConsoleNetworkProtocol.ServerCommand.SetSize:
+                SetSize(message);
+                break;
+            case ConsoleNetworkProtocol.ServerCommand.MoveToCenter:
+                Window?.MoveToCenter();
+                break;
+            case ConsoleNetworkProtocol.ServerCommand.MoveToPosition:
+                MoveToPosition(message);
+                break;
+            case ConsoleNetworkProtocol.ServerCommand.SetTitle:
+                SetTitle(message);
+                break;
+            case ConsoleNetworkProtocol.ServerCommand.GetPosition:
+                SendPosition();
+                break;
         }
+    }
+
+    private static void SendPosition()
+    {
+        Vector2Int? position = Window?.GetPosition();
+        string arguments = AdvancedConsoleAPI.PackArguments([position?.X, position?.Y]);
+        ConsoleNetwork?.SendMessage(ConsoleNetworkProtocol.ClientResponse.Position, arguments);
+    }
+
+    private static void SetSize(string command)
+    {
+        string[] parts = command.Split(ConsoleNetworkProtocol.ArgumentSeparationText);
+        Window?.Screen.SetSize(int.Parse(parts[1]), int.Parse(parts[2]));
+    }
+
+    private static void MoveToPosition(string command)
+    {
+        string[] parts = command.Split(ConsoleNetworkProtocol.ArgumentSeparationText);
+        Window?.MoveTo(new Vector2Int(int.Parse(parts[1]), int.Parse(parts[2])));
+    }
+
+    private static void SetTitle(string command)
+    {
+        string[] parts = command.Split(ConsoleNetworkProtocol.ArgumentSeparationText);
+        Window?.SetTitle(parts[1]);
     }
 }

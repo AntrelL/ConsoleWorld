@@ -1,4 +1,4 @@
-﻿using ColdWind.ConsoleWorldCore;
+﻿using ColdWind.ConsoleWorldCore.OS;
 
 namespace ColdWind.ConsoleWorld;
 
@@ -6,8 +6,7 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
-        Class1.TestPrint();
-        Console.ReadKey();
+        var consoleWorldOS = new ConsoleWorldOS();
+        consoleWorldOS.Start();
     }
 }
