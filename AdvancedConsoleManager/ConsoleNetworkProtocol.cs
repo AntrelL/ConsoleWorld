@@ -11,6 +11,7 @@ public static class ConsoleNetworkProtocol
         { nameof(ServerCommand.MoveToPosition), ServerCommand.MoveToPosition },
         { nameof(ServerCommand.SetTitle), ServerCommand.SetTitle },
         { nameof(ServerCommand.GetPosition), ServerCommand.GetPosition },
+        { nameof(ServerCommand.Destroy), ServerCommand.Destroy },
     };
 
     private static Dictionary<string, ClientResponse> ClientResponseLabels = new()
@@ -25,6 +26,7 @@ public static class ConsoleNetworkProtocol
         MoveToPosition,
         SetTitle,
         GetPosition,
+        Destroy,
     }
 
     public enum ClientResponse

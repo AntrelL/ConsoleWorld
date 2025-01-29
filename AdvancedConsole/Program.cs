@@ -1,4 +1,6 @@
-﻿using ColdWind.AdvancedConsoleManager;
+﻿#pragma warning disable CS8602
+
+using ColdWind.AdvancedConsoleManager;
 
 using AdvancedConsoleAPI = ColdWind.AdvancedConsoleManager.AdvancedConsole;
 
@@ -8,6 +10,7 @@ internal class Program
 {
     private static ConsoleNetwork? ConsoleNetwork;
     private static int Id;
+    private static bool IsRunColorChange = true;
 
     private static Window? Window;
 
@@ -24,11 +27,35 @@ internal class Program
         ConsoleNetwork.MessageReceived += OnMessageReceived;
         ConsoleNetwork.Connect();
 
-        while (true)
-            Thread.Sleep(1000);
-        
+        TestRendering();
+
         //ConsoleNetwork.MessageReceived -= OnMessageReceived;
         //ConsoleNetwork.Disconnect();
+    }
+
+    private static void TestRendering()
+    {
+        Console.CursorVisible = false;
+        Renderer? renderer = Window?.Screen.Renderer;
+
+        var testColorChangeCanvas = new TestColorChangeCanvas(Window.Screen);
+        renderer?.FrameSourceControl.ConnectSource(testColorChangeCanvas, 1);
+
+        renderer.FPSCounterControl.EnableDisplay();
+
+        Thread.Sleep(500);
+
+        renderer?.Run();
+
+        for (int i = 0; IsRunColorChange; i++)
+        {
+            testColorChangeCanvas.CreateFrameWithRandomColor();
+            Thread.Sleep(100);
+        }
+
+        renderer.Stop();
+        ConsoleNetwork.MessageReceived -= OnMessageReceived;
+        ConsoleNetwork.Disconnect();
     }
 
     private static void OnMessageReceived(string message)
@@ -54,7 +81,15 @@ internal class Program
             case ConsoleNetworkProtocol.ServerCommand.GetPosition:
                 SendPosition();
                 break;
+            case ConsoleNetworkProtocol.ServerCommand.Destroy:
+                Destroy();
+                break;
         }
+    }
+
+    private static void Destroy()
+    {
+        IsRunColorChange = false;
     }
 
     private static void SendPosition()

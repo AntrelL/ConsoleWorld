@@ -21,10 +21,15 @@ internal class Screen
         OutputHandle = WinAPI.GetStdHandle(StandardOutputHandle);
 
         _size = size;
+        Renderer = new Renderer(this, OutputHandle);
 
         InitializeMode();
         SetSize(size);
     }
+
+    public event Action<IReadOnlyVector2Int>? SizeChanged;
+
+    public Renderer Renderer { get; init; }
 
     public Vector2Int Size => _size.Copy();
 
@@ -49,6 +54,8 @@ internal class Screen
         ++bufferInfo.srWindow.Bottom;
 
         WinAPI.SetConsoleScreenBufferInfoEx(OutputHandle, ref bufferInfo);
+
+        SizeChanged?.Invoke(Size);
     }
 
     private void InitializeMode()

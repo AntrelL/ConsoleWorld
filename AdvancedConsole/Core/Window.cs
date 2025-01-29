@@ -9,6 +9,7 @@ internal class Window
     private const int GeneralWindowLongStyle = -16;
     private const int WindowStyleThickFrame = 0x00040000;
     private const int WindowStyleMaximizeBox = 0x00010000;
+    private const int WindowStyleMenu = 0x00080000;
 
     private const int SystemMetricsXScreenCoordinate = 0;
     private const int SystemMetricsYScreenCoordinate = 1;
@@ -62,6 +63,7 @@ internal class Window
 
         style ^= WindowStyleThickFrame;
         style &= ~WindowStyleMaximizeBox;
+        style &= ~WindowStyleMenu;
 
         WinAPI.SetWindowLong(Handle, GeneralWindowLongStyle, style);
     }

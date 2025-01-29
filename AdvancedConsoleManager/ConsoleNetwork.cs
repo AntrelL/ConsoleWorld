@@ -32,27 +32,33 @@ public class ConsoleNetwork
 
     public void Disconnect()
     {
+        while (_messagesToSend.Count > 0)
+            Thread.Sleep(1);
+
         _connected = false;
     }
 
-    public void SendMessage(string message)
+    public void SendMessage(string message, bool lastMessage = false)
     {
+        if (lastMessage)
+            _messagesToSend.Clear();
+
         _messagesToSend.Enqueue(message);
     }
 
-    public void SendMessage(ConsoleNetworkProtocol.ServerCommand serverCommand, string arguments = "") =>
-        SendStandardizedMessage(ConsoleNetworkProtocol.ConvertToString(serverCommand), arguments);
+    public void SendMessage(ConsoleNetworkProtocol.ServerCommand serverCommand, string arguments = "", bool lastMessage = false) =>
+        SendStandardizedMessage(ConsoleNetworkProtocol.ConvertToString(serverCommand), arguments, lastMessage);
 
-    public void SendMessage(ConsoleNetworkProtocol.ClientResponse clientResponse, string arguments = "") => 
-        SendStandardizedMessage(ConsoleNetworkProtocol.ConvertToString(clientResponse), arguments);
+    public void SendMessage(ConsoleNetworkProtocol.ClientResponse clientResponse, string arguments = "", bool lastMessage = false) => 
+        SendStandardizedMessage(ConsoleNetworkProtocol.ConvertToString(clientResponse), arguments, lastMessage);
 
-    private void SendStandardizedMessage(string command, string arguments)
+    private void SendStandardizedMessage(string command, string arguments, bool lastMessage)
     {
         string separator = string.IsNullOrEmpty(arguments) 
             ? string.Empty 
             : ConsoleNetworkProtocol.ArgumentSeparationText;
 
-        SendMessage(string.Join(separator, [command, arguments]));
+        SendMessage(string.Join(separator, [command, arguments]), lastMessage);
     }
     
     private string GetPipeName(int id, bool isInput) => 
@@ -75,7 +81,7 @@ public class ConsoleNetwork
                     {
                         string? line = reader.ReadLine();
 
-                        if (line != null)
+                        if (string.IsNullOrEmpty(line) == false)
                             MessageReceived?.Invoke(line);
                     }
                 }
@@ -93,7 +99,7 @@ public class ConsoleNetwork
                 {
                     while (_connected)
                     {
-                        if (_messagesToSend.Count == 0)
+                        if (_messagesToSend.Count == 0 || (client.CanWrite == false))
                             continue;
 
                         writer.AutoFlush = true;

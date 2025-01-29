@@ -102,6 +102,8 @@ public class AdvancedConsole
 
     public void Destroy()
     {
+        _consoleNetwork.SendMessage(ConsoleNetworkProtocol.ServerCommand.Destroy, lastMessage: true);
+
         _consoleNetwork.MessageReceived -= OnMessageReceived;
         _consoleNetwork.Disconnect();
     }
